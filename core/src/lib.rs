@@ -21,6 +21,7 @@ pub struct SearchResultItemRepository {
 	pub full_name: String,
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct Backlink {
 	pub repository: String,
 	pub reference_count: u32,
@@ -41,6 +42,7 @@ pub trait Fetcher {
 	) -> Result<SearchResult, Self::Error>;
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum Error {
 	RequestError,
 }
