@@ -27,13 +27,22 @@ pub struct Backlink {
 }
 
 pub struct Context {
-	github_token: String,
+	pub github_token: String,
 }
 
 pub trait Fetcher {
+	type Error;
+
 	fn set_context(&mut self, context: Context);
 
-	fn fetch_search_result(&mut self, repository_url: &str) -> SearchResult;
+	fn fetch_search_result(
+		&mut self,
+		repository_url: &str,
+	) -> Result<SearchResult, Self::Error>;
+}
+
+pub enum Error {
+	RequestError,
 }
 
 pub struct Resolver<T> {
@@ -41,13 +50,18 @@ pub struct Resolver<T> {
 	fetcher: T,
 }
 
-impl<T: Fetcher> Resolver<T> {
+impl<T> Resolver<T>
+where
+	T: Fetcher,
+	<T as Fetcher>::Error: Into<Error>,
+{
 	pub fn new(url: String, fetcher: T) -> Self { Self { url, fetcher } }
 
-	pub fn fetch_backlinks(&mut self) -> Vec<Backlink> {
+	pub fn fetch_backlinks(&mut self) -> Result<Vec<Backlink>, Error> {
 		let list = self
 			.fetcher
-			.fetch_search_result(&self.url);
+			.fetch_search_result(&self.url)
+			.map_err(|e| e.into())?;
 
 		let items = list.items;
 		let mut sb = HashMap::new();
@@ -57,11 +71,12 @@ impl<T: Fetcher> Resolver<T> {
 				.or_default() += 1;
 		}
 
-		sb.into_iter()
+		Ok(sb
+			.into_iter()
 			.map(|(k, v)| Backlink {
 				repository: k,
 				reference_count: v,
 			})
-			.collect()
+			.collect())
 	}
 }
