@@ -26,7 +26,13 @@ pub struct Backlink {
 	pub reference_count: u32,
 }
 
+pub struct Context {
+	github_token: String,
+}
+
 pub trait Fetcher {
+	fn set_context(&mut self, context: Context);
+
 	fn fetch_search_result(&mut self, repository_url: &str) -> SearchResult;
 }
 
