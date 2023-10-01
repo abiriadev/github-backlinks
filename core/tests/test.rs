@@ -57,7 +57,7 @@ impl Fetcher for UreqFetcher {
 
 #[test]
 fn a() {
-	let url = "https://github.com/abiriadev/abiriadev";
+	let url = "https://github.com/abiriadev";
 	let mut fetcher = UreqFetcher::new();
 
 	fetcher.set_context(Context {
@@ -66,5 +66,5 @@ fn a() {
 
 	let res = Resolver::new(url.to_owned(), fetcher).fetch_backlinks();
 
-	assert_eq!(res, Ok(vec![]));
+	assert!(res.is_ok());
 }

@@ -13,7 +13,7 @@ pub struct SearchResult {
 pub struct SearchResultItem {
 	pub repository: SearchResultItemRepository,
 	pub html_url: String,
-	pub score: u32,
+	pub score: f64,
 }
 
 #[derive(Deserialize)]
